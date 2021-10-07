@@ -48,7 +48,7 @@ router.post('/api/payments',
             source: token,
           });
 
-        const payment = await Payment.build({
+        const payment = Payment.build({
             orderId : orderId,
             stripeId: charge.id
         })
