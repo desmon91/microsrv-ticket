@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-depl
+spec:
+  replicas: 1
+  #Selector used by Deployment how find all the pods it is going to create
+  selector:
+    matchLabels:
+      app: auth
+  #Template is telling Deployment how to create each individual pods
+  template:
+    metadata:
+      labels:
+        app: auth
+    #Spec telling pods how to behave
+    spec:
+      containers:
+        - name: auth
+          image: desmon91/auth
+          env:
+            - name: MONGO_URI
+              value: "mongodb://auth-mongo-srv:27017/auth"
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+
+---
+#Service kind used to create a simple url so the pods can be communicated
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-srv
+spec:
+  #Selector here is telling Service how to find the pods name
+  selector:
+    app: auth
+  #Name here are for logging purposes
+  ports:
+    - name: auth
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
